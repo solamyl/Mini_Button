@@ -31,9 +31,7 @@ bool Button::read()
                 m_dbStart = m_time;
                 m_fsm = DEBOUNCE;
             }
-            else {                      // nothing to see here
-                m_changed = false;
-            }
+            m_changed = false;
             break;
 
         case DEBOUNCE:

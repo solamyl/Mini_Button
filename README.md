@@ -1,15 +1,22 @@
-# Arduino Button Library
-https://github.com/JChristensen/JC_Button  
-README file  
+# Mini_Button
+This is quite minimal Arduino button lib focused on low-memory usage and small amount of code produced.
+* detects presses, releases and long presses
+* async handling for calling from the loop(). no delay() or similar blocking
+* robust debouncing mechanism
+* small memory footprint
+* easy API (the same as JC_Button)
+
+This library was forked from JC_Button by Jack Christensen.
+https://github.com/JChristensen/JC_Button
+
+It uses the same (simple) interface, but the logic was reworked and/or optimized. I hope it is still fully interchangable with original JC_Button.
 
 ## License
+This program is licensed under the (GNU GPLv3 license)[LICENSE.md] - the same as original library.
+https://www.gnu.org/licenses/gpl.html
+
+Mimi_Button Copyright (C) 2025 Štěpán Škrob GNU GPL v3.0
 Arduino Button Library Copyright (C) 2018-2019 Jack Christensen GNU GPL v3.0
-
-This program is free software: you can redistribute it and/or modify it under the terms of the GNU General Public License v3.0 as published by the Free Software Foundation.
-
-This program is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU General Public License for more details.
-
-You should have received a copy of the GNU General Public License along with this program. If not, see <https://www.gnu.org/licenses/gpl.html>
 
 ## Introduction
 The Button library is for debouncing and reading momentary contact switches like tactile button switches.  "Long presses" of arbitrary length can be detected. Works well in state machine constructs.  Use the read() function to read each button in the main loop, which should execute as fast as possible.

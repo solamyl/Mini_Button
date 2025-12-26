@@ -1,9 +1,9 @@
-// Arduino Button Library
-// https://github.com/JChristensen/JC_Button
-// Copyright (C) 2018 by Jack Christensen and licensed under
-// GNU GPL v3.0, https://www.gnu.org/licenses/gpl.html
+// Mini_Button Arduino library
+// https://github.com/solamyl/Mini_Button
+// Copyright (C) 2018 by Jack Christensen
+// licensed under GNU GPL v3.0, https://www.gnu.org/licenses/gpl.html
 
-#include "JC_Button.h"
+#include "Mini_Button.h"
 
 // initialize a Button object
 void Button::begin()

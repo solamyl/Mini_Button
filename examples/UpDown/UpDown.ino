@@ -1,14 +1,14 @@
-// Arduino Button Library
-// https://github.com/JChristensen/JC_Button
-// Copyright (C) 2018 by Jack Christensen and licensed under
-// GNU GPL v3.0, https://www.gnu.org/licenses/gpl.html
+// Mini_Button Arduino library
+// https://github.com/solamyl/Mini_Button
+// Copyright (C) 2018 by Jack Christensen
+// licensed under GNU GPL v3.0, https://www.gnu.org/licenses/gpl.html
 //
 // Example sketch that uses both short and long button presses to adjust
 // a number up and down, between two limits. Short presses increment
 // or decrement by one, long presses repeat at a specified rate.
 // Every time the number changes, it is written to the serial monitor.
 
-#include <JC_Button.h>              // https://github.com/JChristensen/JC_Button
+#include <Mini_Button.h>              // https://github.com/solamyl/Mini_Button
 
 // pin assignments
 const byte

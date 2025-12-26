@@ -1,11 +1,11 @@
-// Arduino Button Library
-// https://github.com/JChristensen/JC_Button
-// Copyright (C) 2018 by Jack Christensen and licensed under
-// GNU GPL v3.0, https://www.gnu.org/licenses/gpl.html
+// Mini_Button Arduino library
+// https://github.com/solamyl/Mini_Button
+// Copyright (C) 2018 by Jack Christensen
+// licensed under GNU GPL v3.0, https://www.gnu.org/licenses/gpl.html
 //
 // Example sketch to demonstrate toggle buttons.
 
-#include <JC_Button.h>          // https://github.com/JChristensen/JC_Button
+#include <Mini_Button.h>          // https://github.com/solamyl/Mini_Button
 
 // pin assignments
 const byte

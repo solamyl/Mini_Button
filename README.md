@@ -9,13 +9,14 @@ This is quite minimal Arduino button lib focused on low-memory usage and small a
 This library was forked from JC_Button by Jack Christensen.
 https://github.com/JChristensen/JC_Button
 
-It uses the same (simple) interface, but the logic was reworked and/or optimized. I hope it is still fully interchangable with original JC_Button.
+It uses the same (simple) interface, but the logic was reworked and/or optimized. I hope it is still fully interchangable with the original JC_Button.
 
 ## License
-This program is licensed under the (GNU GPLv3 license)[LICENSE.md] - the same as original library.
+This program is licensed under the [GNU GPLv3 license](LICENSE.md) - the same as the original library.
 https://www.gnu.org/licenses/gpl.html
 
 Mimi_Button Copyright (C) 2025 Štěpán Škrob GNU GPL v3.0
+
 Arduino Button Library Copyright (C) 2018-2019 Jack Christensen GNU GPL v3.0
 
 ## Introduction

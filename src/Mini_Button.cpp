@@ -10,9 +10,8 @@ void Button::begin()
 {
     pinMode(m_pin, m_puEnable ? INPUT_PULLUP : INPUT);
     m_state = static_cast<bool>(digitalRead(m_pin)) ^ m_invert;
-    m_time = millis();
     m_lastState = m_state;
-    //m_changed = false;
+    m_time = millis();
     m_lastChange = m_time;
 }
 
@@ -25,25 +24,32 @@ bool Button::read()
 
     m_lastState = m_state;
 
-    switch (m_fsm) {
-        case STABLE:
-            if (pinVal != m_state) {    // maybe a change, but debounce first
-                m_dbStart = m_time;
-                m_fsm = DEBOUNCE;
-            }
-            //m_changed = false;
-            break;
-
-        case DEBOUNCE:
+    if (m_debouncing) {
+        // "debouncing" mode
+        if (pinVal != m_state) {
+            // pinVal still has the changed value - continue with the debouncing
             if (m_time - m_dbStart >= m_dbTime) {
-                m_fsm = STABLE;
-                if (pinVal != m_state) {    // a real change (else just noise)
-                    m_state = pinVal;
-                    m_lastChange = m_time;
-                    //m_changed = true;
-                }
+                // pinVal is stable long enough => change the state
+                m_state = pinVal;
+                m_lastChange = m_time;
+                m_debouncing = false; // stop debouncing
             }
-            break;
+        }
+        else {
+            // pinVal returned back to a previous state
+            m_debouncing = false; // end debouncing
+        }
+    }
+    else {
+        // "stable state" mode
+        if (pinVal != m_state) {
+            // change on input => start debouncing
+            m_dbStart = m_time;
+            m_debouncing = true;
+        }
+        else {
+            // nothing happens
+        }
     }
     return m_state;
 }

@@ -59,19 +59,17 @@ class Button
         // changed state.
         uint32_t lastChange() const {return m_lastChange;}
 
-        // has the state changed?
+        // has the state changed since the last call to the read()?
         bool changed() const {return m_state != m_lastState;}
 
     private:
-        enum fsmStates_t {STABLE, DEBOUNCE};    // states for the state machine
-        fsmStates_t m_fsm {STABLE};             // initial state machine state
         uint8_t m_pin;                  // arduino pin number connected to button
         uint32_t m_dbTime;              // debounce time (ms)
         bool m_puEnable;                // internal pullup resistor enabled
         bool m_invert;                  // if true, interpret logic low as pressed, else interpret logic high as pressed
+        bool m_debouncing {false};      // if true, we are in "debouncing" mode
         bool m_state {false};           // current button state, true=pressed
-        bool m_lastState {false};       // previous button state
-        //bool m_changed {false};         // state changed since last read
+        bool m_lastState {false};       // button state at the last call to the read()
         uint32_t m_time {0};            // time of current state (ms from millis)
         uint32_t m_lastChange {0};      // time of last state change (ms)
         uint32_t m_dbStart;             // debounce interval start time

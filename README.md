@@ -1,9 +1,9 @@
 # Mini_Button
 This is quite minimal Arduino button lib focused on low-memory usage and small amount of code produced.
 * detects presses, releases and long presses
-* async handling for calling from the loop(). no delay() or similar blocking
+* async handling to be called from within the loop(). no delay() or similar blocking
 * robust debouncing mechanism
-* small memory footprint
+* small memory footprint (10 bytes per button)
 * easy API (the same as JC_Button)
 
 This library was forked from JC_Button by Jack Christensen.

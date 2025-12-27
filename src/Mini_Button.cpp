@@ -28,7 +28,8 @@ bool Button::read()
         // "debouncing" mode
         if (pinVal != m_state) {
             // pinVal still has the changed value - continue with the debouncing
-            if (m_time - m_dbStart >= m_dbTime) {
+            uint16_t m_time16 = static_cast<uint16_t>(m_time);
+            if (m_time16 - m_dbStart >= m_dbTime) {
                 // pinVal is stable long enough => change the state
                 m_state = pinVal;
                 m_lastChange = m_time;
@@ -44,7 +45,7 @@ bool Button::read()
         // "stable state" mode
         if (pinVal != m_state) {
             // change on input => start debouncing
-            m_dbStart = m_time;
+            m_dbStart = static_cast<uint16_t>(m_time);
             m_debouncing = true;
         }
         else {

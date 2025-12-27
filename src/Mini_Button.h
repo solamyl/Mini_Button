@@ -10,6 +10,9 @@
 
 class Button
 {
+    // debounce time is limited to 60 sec
+    static constexpr uint32_t maxDebounceTime = 60000ul;
+
     public:
         // Button(pin, dbTime, puEnable, invert) instantiates a button object.
         //
@@ -21,7 +24,11 @@ class Button
         // puEnable true to enable the AVR internal pullup resistor (default true)
         // invert   true to interpret a low logic level as pressed (default true)
         Button(uint8_t pin, uint32_t dbTime=25, uint8_t puEnable=true, uint8_t invert=true)
-            : m_pin(pin), m_dbTime(dbTime), m_puEnable(puEnable), m_invert(invert) {}
+            : m_pin(pin), m_dbTime(dbTime), m_puEnable(puEnable), m_invert(invert)
+        {
+            if (dbTime > maxDebounceTime)
+                m_dbTime = maxDebounceTime;
+        }
 
         // Initialize a Button object
         void begin();
@@ -64,7 +71,7 @@ class Button
 
     private:
         uint8_t m_pin;                  // arduino pin number connected to button
-        uint32_t m_dbTime;              // debounce time (ms)
+        uint16_t m_dbTime;              // debounce time (ms)
         bool m_puEnable;                // internal pullup resistor enabled
         bool m_invert;                  // if true, interpret logic low as pressed, else interpret logic high as pressed
         bool m_debouncing {false};      // if true, we are in "debouncing" mode
@@ -72,7 +79,7 @@ class Button
         bool m_lastState {false};       // button state at the last call to the read()
         uint32_t m_time {0};            // time of current state (ms from millis)
         uint32_t m_lastChange {0};      // time of last state change (ms)
-        uint32_t m_dbStart;             // debounce interval start time
+        uint16_t m_dbStart;             // debounce interval start time (low 16-bits from millis)
 };
 
 // a derived class for a "push-on, push-off" (toggle) type button.

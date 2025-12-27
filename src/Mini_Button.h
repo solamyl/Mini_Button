@@ -24,7 +24,8 @@ class Button
         // puEnable true to enable the AVR internal pullup resistor (default true)
         // invert   true to interpret a low logic level as pressed (default true)
         Button(uint8_t pin, uint32_t dbTime=25, uint8_t puEnable=true, uint8_t invert=true)
-            : m_pin(pin), m_dbTime(dbTime), m_puEnable(puEnable), m_invert(invert)
+            : m_pin(pin), m_dbTime(dbTime), m_puEnable(puEnable), m_invert(invert),
+            m_debouncing(false), m_state(false), m_lastState(false)
         {
             if (dbTime > maxDebounceTime)
                 m_dbTime = maxDebounceTime;
@@ -55,12 +56,12 @@ class Button
         // Returns true if the button state at the last call to read() was pressed,
         // and has been in that state for at least the given number of milliseconds.
         // This function does not cause the button to be read.
-        bool pressedFor(uint32_t ms) const {return m_state && m_time - m_lastChange >= ms;}
+        bool pressedFor(uint32_t ms) const {return m_state && (millis() - m_lastChange) >= ms;}
 
         // Returns true if the button state at the last call to read() was released,
         // and has been in that state for at least the given number of milliseconds.
         // This function does not cause the button to be read.
-        bool releasedFor(uint32_t ms) const {return !m_state && m_time - m_lastChange >= ms;}
+        bool releasedFor(uint32_t ms) const {return !m_state && (millis() - m_lastChange) >= ms;}
 
         // Returns the time in milliseconds (from millis) that the button last
         // changed state.
@@ -71,14 +72,13 @@ class Button
 
     private:
         uint8_t m_pin;                  // arduino pin number connected to button
-        uint16_t m_dbTime;              // debounce time (ms)
-        bool m_puEnable;                // internal pullup resistor enabled
-        bool m_invert;                  // if true, interpret logic low as pressed, else interpret logic high as pressed
-        bool m_debouncing {false};      // if true, we are in "debouncing" mode
-        bool m_state {false};           // current button state, true=pressed
-        bool m_lastState {false};       // button state at the last call to the read()
-        uint32_t m_time {0};            // time of current state (ms from millis)
-        uint32_t m_lastChange {0};      // time of last state change (ms)
+        uint16_t m_dbTime;              // debounce time (ms; limited to max 60000ms)
+        bool m_puEnable : 1;            // internal pullup resistor enabled
+        bool m_invert : 1;              // if true, interpret logic low as pressed, else interpret logic high as pressed
+        bool m_debouncing : 1;          // if true, we are in "debouncing" mode
+        bool m_state : 1;               // current button state, true=pressed
+        bool m_lastState : 1;           // button state at the previous call to the read()
+        uint32_t m_lastChange {0};      // timestamp of the last state change (ms from millis)
         uint16_t m_dbStart;             // debounce interval start time (low 16-bits from millis)
 };
 

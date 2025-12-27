@@ -11,15 +11,15 @@ void Button::begin()
     pinMode(m_pin, m_puEnable ? INPUT_PULLUP : INPUT);
     m_state = static_cast<bool>(digitalRead(m_pin)) ^ m_invert;
     m_lastState = m_state;
-    m_time = millis();
-    m_lastChange = m_time;
+    m_lastChange = millis();
 }
 
 // returns the state of the button, true if pressed, false if released.
 // does debouncing, captures and maintains times, previous state, etc.
 bool Button::read()
 {
-    m_time = millis();
+    uint32_t now = millis();
+    uint16_t now16 = static_cast<uint16_t>(now); // low 16-bits from millis()
     bool pinVal = static_cast<bool>(digitalRead(m_pin)) ^ m_invert;
 
     m_lastState = m_state;
@@ -28,11 +28,10 @@ bool Button::read()
         // "debouncing" mode
         if (pinVal != m_state) {
             // pinVal still has the changed value - continue with the debouncing
-            uint16_t m_time16 = static_cast<uint16_t>(m_time);
-            if (m_time16 - m_dbStart >= m_dbTime) {
+            if (now16 - m_dbStart >= m_dbTime) {
                 // pinVal is stable long enough => change the state
                 m_state = pinVal;
-                m_lastChange = m_time;
+                m_lastChange = now;
                 m_debouncing = false; // stop debouncing
             }
         }
@@ -45,7 +44,7 @@ bool Button::read()
         // "stable state" mode
         if (pinVal != m_state) {
             // change on input => start debouncing
-            m_dbStart = static_cast<uint16_t>(m_time);
+            m_dbStart = now16;
             m_debouncing = true;
         }
         else {

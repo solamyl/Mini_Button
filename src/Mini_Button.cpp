@@ -8,7 +8,7 @@
 // initialize a Button object
 void Button::begin()
 {
-    pinMode(m_pin, m_puEnable ? INPUT_PULLUP : INPUT);
+    pinMode(m_pin, m_pullup ? INPUT_PULLUP : INPUT);
     m_state = static_cast<bool>(digitalRead(m_pin)) ^ m_invert;
     m_lastState = m_state;
     m_lastChange = millis();

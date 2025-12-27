@@ -11,24 +11,24 @@
 class Button
 {
     // debounce time is limited to 60 sec
-    static constexpr uint32_t maxDebounceTime = 60000ul;
+    static constexpr uint32_t m_maxDebounceTime = 60000ul;
 
     public:
-        // Button(pin, dbTime, puEnable, invert) instantiates a button object.
+        // Button(pin, dbTime, pullup, invert) instantiates a button object.
         //
         // Required parameter:
         // pin      The Arduino pin the button is connected to
         //
         // Optional parameters:
-        // dbTime   Debounce time in milliseconds (default 25ms)
-        // puEnable true to enable the AVR internal pullup resistor (default true)
+        // dbTime   Debounce time in milliseconds (max 60000ms, default 25ms)
+        // pullup   true to enable the AVR internal pullup resistor (default true)
         // invert   true to interpret a low logic level as pressed (default true)
-        Button(uint8_t pin, uint32_t dbTime=25, uint8_t puEnable=true, uint8_t invert=true)
-            : m_pin(pin), m_dbTime(dbTime), m_puEnable(puEnable), m_invert(invert),
+        Button(uint8_t pin, uint32_t dbTime=25, bool pullup=true, bool invert=true)
+            : m_pin(pin), m_dbTime(dbTime), m_pullup(pullup), m_invert(invert),
             m_debouncing(false), m_state(false), m_lastState(false)
         {
-            if (dbTime > maxDebounceTime)
-                m_dbTime = maxDebounceTime;
+            if (dbTime > m_maxDebounceTime)
+                m_dbTime = m_maxDebounceTime;
         }
 
         // Initialize a Button object
@@ -73,7 +73,7 @@ class Button
     private:
         uint8_t m_pin;                  // arduino pin number connected to button
         uint16_t m_dbTime;              // debounce time (ms; limited to max 60000ms)
-        bool m_puEnable : 1;            // internal pullup resistor enabled
+        bool m_pullup : 1;              // internal pullup resistor enabled
         bool m_invert : 1;              // if true, interpret logic low as pressed, else interpret logic high as pressed
         bool m_debouncing : 1;          // if true, we are in "debouncing" mode
         bool m_state : 1;               // current button state, true=pressed
@@ -89,8 +89,8 @@ class ToggleButton : public Button
     public:
 
         // constructor is similar to Button, but includes the initial state for the toggle.
-        ToggleButton(uint8_t pin, bool initialState=false, uint32_t dbTime=25, uint8_t puEnable=true, uint8_t invert=true)
-            : Button(pin, dbTime, puEnable, invert), m_toggleState(initialState) {}
+        ToggleButton(uint8_t pin, bool initialState=false, uint32_t dbTime=25, bool pullup=true, bool invert=true)
+            : Button(pin, dbTime, pullup, invert), m_toggleState(initialState) {}
 
         // read the button and return its state.
         // should be called frequently.

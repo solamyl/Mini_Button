@@ -37,16 +37,16 @@ The following example sketches are included with the **Button** library:
 
 ## Constructors
 
-### Button(pin, dbTime, puEnable, invert)
+### Button(pin, dbTime, pullup, invert)
 ##### Description
 The constructor defines a button object.
 ##### Syntax
-`Button(pin, dbTime, puEnable, invert);`
+`Button(pin, dbTime, pullup, invert);`
 ##### Required parameter
 **pin:** Arduino pin number that the button is connected to *(byte)*  
 ##### Optional parameters
-**dbTime:** Debounce time in milliseconds. Defaults to 25ms if not given. *(unsigned long)*  
-**puEnable:** *true* to enable the microcontroller's internal pull-up resistor, else *false*. Defaults to *true* if not given. *(bool)*  
+**dbTime:** Debounce time in milliseconds, max 60000ms. Defaults to 25ms if not given. *(unsigned long)*  
+**pullup:** *true* to enable the microcontroller's internal pull-up resistor, else *false*. Defaults to *true* if not given. *(bool)*  
 **invert:** *false* interprets a high logic level to mean the button is pressed, *true* interprets a low level as pressed. *true* should be used when a pull-up resistor is employed, *false* for a pull-down resistor. Defaults to *true* if not given. *(bool)*
 ##### Returns
 None.
@@ -63,17 +63,17 @@ Button myButton(4, 25, false, false);
 
 ```
 
-### ToggleButton(pin, initialState, dbTime, puEnable, invert)
+### ToggleButton(pin, initialState, dbTime, pullup, invert)
 ##### Description
 The constructor defines a toggle button object, which has "push-on, push-off" functionality. The initial state can be on or off. See the section, [ToggleButton Library Functions](https://github.com/JChristensen/JC_Button#togglebutton-library-functions) for functions that apply specifically to the ToggleButton object. The ToggleButton class is derived from the Button class, so all Button functions are available, but because it is inherently a more limited concept, the special ToggleButton functions will be most useful, along with `begin()` and `read()`.
 ##### Syntax
-`ToggleButton(pin, initialState, dbTime, puEnable, invert);`
+`ToggleButton(pin, initialState, dbTime, pullup, invert);`
 ##### Required parameter
 **pin:** Arduino pin number that the button is connected to *(byte)*  
 ##### Optional parameters
 **initialState:** Initial state for the button. Defaults to off (false) if not given. *(bool)*  
-**dbTime:** Debounce time in milliseconds. Defaults to 25ms if not given. *(unsigned long)*  
-**puEnable:** *true* to enable the microcontroller's internal pull-up resistor, else *false*. Defaults to *true* if not given. *(bool)*  
+**dbTime:** Debounce time in milliseconds, max 60000ms. Defaults to 25ms if not given. *(unsigned long)*  
+**pullup:** *true* to enable the microcontroller's internal pull-up resistor, else *false*. Defaults to *true* if not given. *(bool)*  
 **invert:** *false* interprets a high logic level to mean the button is pressed, *true* interprets a low level as pressed. *true* should be used when a pull-up resistor is employed, *false* for a pull-down resistor. Defaults to *true* if not given. *(bool)*
 ##### Returns
 None.

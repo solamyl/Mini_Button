@@ -1,6 +1,6 @@
 // Mini_Button Arduino library
 // https://github.com/solamyl/Mini_Button
-// Copyright (C) 2018 by Jack Christensen
+// Copyright (C) 2025 by Štěpán Škrob, Copyright (C) 2018 by Jack Christensen
 // licensed under GNU GPL v3.0, https://www.gnu.org/licenses/gpl.html
 
 #ifndef MINI_BUTTON_H_INCLUDED
@@ -42,8 +42,8 @@ class Button
         // These functions check the button state to see if it changed
         // between the last two reads and return true or false accordingly.
         // These functions do not cause the button to be read.
-        bool wasPressed() const {return m_state && m_changed;}
-        bool wasReleased() const {return !m_state && m_changed;}
+        bool wasPressed() const {return m_state && changed();}
+        bool wasReleased() const {return !m_state && changed();}
 
         // Returns true if the button state at the last call to read() was pressed,
         // and has been in that state for at least the given number of milliseconds.
@@ -59,6 +59,9 @@ class Button
         // changed state.
         uint32_t lastChange() const {return m_lastChange;}
 
+        // has the state changed?
+        bool changed() const {return m_state != m_lastState;}
+
     private:
         enum fsmStates_t {STABLE, DEBOUNCE};    // states for the state machine
         fsmStates_t m_fsm {STABLE};             // initial state machine state
@@ -68,7 +71,7 @@ class Button
         bool m_invert;                  // if true, interpret logic low as pressed, else interpret logic high as pressed
         bool m_state {false};           // current button state, true=pressed
         bool m_lastState {false};       // previous button state
-        bool m_changed {false};         // state changed since last read
+        //bool m_changed {false};         // state changed since last read
         uint32_t m_time {0};            // time of current state (ms from millis)
         uint32_t m_lastChange {0};      // time of last state change (ms)
         uint32_t m_dbStart;             // debounce interval start time
@@ -91,23 +94,18 @@ class ToggleButton : public Button
             Button::read();
             if (wasPressed()) {
                 m_toggleState = !m_toggleState;
-                m_changed = true;
-            }
-            else {
-                m_changed = false;
             }
             return m_toggleState;
         }
 
         // has the state changed?
-        bool changed() const {return m_changed;}
+        bool changed() const {return wasPressed();} //the state changes just and only on wasPressed()
 
         // return the current state
         bool toggleState() const {return m_toggleState;}
 
     private:
         bool m_toggleState;
-        bool m_changed = false;
 };
 
 #endif // MINI_BUTTON_H_INCLUDED

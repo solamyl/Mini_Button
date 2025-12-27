@@ -1,3 +1,9 @@
+# Syntax Coloring Map For ExampleLibrary
+# KEYWORD1 datatypes
+# KEYWORD2 methods, functions and instances
+# KEYWORD3 structures
+# LITERAL1 constants
+
 Mini_Button	KEYWORD1
 JC_Button	KEYWORD1
 Button	KEYWORD1

@@ -10,8 +10,8 @@
 
 class Button
 {
-    // debounce time is limited to 60 sec
-    static constexpr uint32_t m_maxDebounceTime = 60000ul;
+    // debounce time is limited to max 60 sec
+    static constexpr uint32_t MAX_DEBOUNCE_TIME = 60000ul;
 
     public:
         // Button(pin, dbTime, pullup, invert) instantiates a button object.
@@ -23,12 +23,14 @@ class Button
         // dbTime   Debounce time in milliseconds (max 60000ms, default 25ms)
         // pullup   true to enable the AVR internal pullup resistor (default true)
         // invert   true to interpret a low logic level as pressed (default true)
-        Button(uint8_t pin, uint32_t dbTime=25, bool pullup=true, bool invert=true)
+        Button(uint8_t pin, uint16_t dbTime=25, bool pullup=true, bool invert=true)
             : m_pin(pin), m_dbTime(dbTime), m_pullup(pullup), m_invert(invert),
             m_debouncing(false), m_state(false), m_lastState(false)
         {
-            if (dbTime > m_maxDebounceTime)
-                m_dbTime = m_maxDebounceTime;
+            if (dbTime < 1)
+                m_dbTime = 1;
+            else if (dbTime > MAX_DEBOUNCE_TIME)
+                m_dbTime = MAX_DEBOUNCE_TIME;
         }
 
         // Initialize a Button object
@@ -39,32 +41,32 @@ class Button
         // Call this function frequently to ensure the sketch is responsive to user input.
         bool read();
 
-        // Returns true if the button state was pressed at the last call to read().
+        // Returns true if the button state was "pressed" at the last call to read().
         // Does not cause the button to be read.
         bool isPressed() const {return m_state;}
 
-        // Returns true if the button state was released at the last call to read().
+        // Returns true if the button state was "released" at the last call to read().
         // Does not cause the button to be read.
         bool isReleased() const {return !m_state;}
 
         // These functions check the button state to see if it changed
         // between the last two reads and return true or false accordingly.
         // These functions do not cause the button to be read.
-        bool wasPressed() const {return m_state && changed();}
-        bool wasReleased() const {return !m_state && changed();}
+        bool wasPressed() const {return isPressed() && changed();}
+        bool wasReleased() const {return isReleased() && changed();}
 
         // Returns true if the button state at the last call to read() was pressed,
         // and has been in that state for at least the given number of milliseconds.
         // This function does not cause the button to be read.
-        bool pressedFor(uint32_t ms) const {return m_state && (millis() - m_lastChange) >= ms;}
+        bool pressedFor(uint32_t ms) const {return isPressed() && (millis() - m_lastChange) >= ms;}
 
         // Returns true if the button state at the last call to read() was released,
         // and has been in that state for at least the given number of milliseconds.
         // This function does not cause the button to be read.
-        bool releasedFor(uint32_t ms) const {return !m_state && (millis() - m_lastChange) >= ms;}
+        bool releasedFor(uint32_t ms) const {return isReleased() && (millis() - m_lastChange) >= ms;}
 
-        // Returns the time in milliseconds (from millis) that the button last
-        // changed state.
+        // Returns the time (from millis) of the last moment
+        // the button has changed its "stable" state.
         uint32_t lastChange() const {return m_lastChange;}
 
         // has the state changed since the last call to the read()?
@@ -72,13 +74,13 @@ class Button
 
     private:
         uint8_t m_pin;                  // arduino pin number connected to button
-        uint16_t m_dbTime;              // debounce time (ms; limited to max 60000ms)
-        bool m_pullup : 1;              // internal pullup resistor enabled
-        bool m_invert : 1;              // if true, interpret logic low as pressed, else interpret logic high as pressed
+        uint16_t m_dbTime;              // debounce time (in msec; limited to max 60000ms)
+        bool m_pullup : 1;              // internal pullup resistor, true=enabled
+        bool m_invert : 1;              // input signal logic: true=LOW is "pressed", false=HIGH is "pressed"
         bool m_debouncing : 1;          // if true, we are in "debouncing" mode
-        bool m_state : 1;               // current button state, true=pressed
+        bool m_state : 1;               // current button state, true="pressed"
         bool m_lastState : 1;           // button state at the previous call to the read()
-        uint32_t m_lastChange {0};      // timestamp of the last state change (ms from millis)
+        uint32_t m_lastChange {0};      // timestamp of the last state change (msec from millis)
         uint16_t m_dbStart;             // debounce interval start time (low 16-bits from millis)
 };
 
@@ -89,19 +91,12 @@ class ToggleButton : public Button
     public:
 
         // constructor is similar to Button, but includes the initial state for the toggle.
-        ToggleButton(uint8_t pin, bool initialState=false, uint32_t dbTime=25, bool pullup=true, bool invert=true)
+        ToggleButton(uint8_t pin, bool initialState=false, uint16_t dbTime=25, bool pullup=true, bool invert=true)
             : Button(pin, dbTime, pullup, invert), m_toggleState(initialState) {}
 
-        // read the button and return its state.
+        // read the button and return its toggle-state.
         // should be called frequently.
-        bool read()
-        {
-            Button::read();
-            if (wasPressed()) {
-                m_toggleState = !m_toggleState;
-            }
-            return m_toggleState;
-        }
+        bool read();
 
         // has the state changed?
         bool changed() const {return wasPressed();} //the state changes just and only on wasPressed()
@@ -110,7 +105,53 @@ class ToggleButton : public Button
         bool toggleState() const {return m_toggleState;}
 
     private:
-        bool m_toggleState;
+        bool m_toggleState;             // flip-flop state of the switch
+};
+
+// a derived class for the button with auto-repeat feature
+class AutoRepeatButton : public Button
+{
+    public:
+        AutoRepeatButton(uint8_t pin, uint16_t delay=500, uint16_t rate=100, uint16_t dbTime=25, bool pullup=true, bool invert=true)
+            : Button(pin, dbTime, pullup, invert), m_delay(delay), m_rate(rate)
+        {
+            m_virtualState = Button::isPressed();
+            m_virtualLastState = m_virtualState;
+
+            if (m_delay < 1)
+                m_delay = 1;
+            if (m_rate < 1)
+                m_rate = 1;
+        }
+        
+        // read the button, obtain physical state and then calculate virtual state.
+        // repeating is made by inserting fake key-releases into the stream of "pressed" states
+        // should be called frequently
+        bool read();
+
+        // Returns true if the button state was pressed at the last call to read().
+        // Does not cause the button to be read.
+        bool isPressed() const {return m_virtualState;}
+
+        // Returns true if the button state was released at the last call to read().
+        // Does not cause the button to be read.
+        bool isReleased() const {return !m_virtualState;}
+
+        // These functions check the button state to see if it changed
+        // between the last two reads and return true or false accordingly.
+        // These functions do not cause the button to be read.
+        bool wasPressed() const {return isPressed() && changed();}
+        bool wasReleased() const {return isReleased() && changed();}
+
+        // has the state changed since the last call to the read()?
+        bool changed() const {return m_virtualState != m_virtualLastState;}
+
+    private:
+        uint16_t m_delay;               // delay in msec after which repeating keypresses begin
+        uint16_t m_rate;                // repeating rate period in msec
+        bool m_virtualState : 1;        // current state of the repeating button
+        bool m_virtualLastState : 1;    // state of the repeating button at the previous call to read()
+        uint16_t m_repeatCounter {0};   // number of keyreleases made when autorepeating
 };
 
 #endif // MINI_BUTTON_H_INCLUDED

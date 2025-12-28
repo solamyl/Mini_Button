@@ -8,6 +8,7 @@ Mini_Button	KEYWORD1
 JC_Button	KEYWORD1
 Button	KEYWORD1
 ToggleButton	KEYWORD1
+AutoRepeatButton	KEYWORD1
 begin	KEYWORD2
 read	KEYWORD2
 isPressed	KEYWORD2

@@ -53,3 +53,73 @@ bool Button::read()
     }
     return m_state;
 }
+
+// read the button and return its state.
+// should be called frequently.
+bool ToggleButton::read()
+{
+    Button::read(); //read input and do the debouncing
+
+    if (Button::wasPressed()) {
+        m_toggleState = !m_toggleState;
+    }
+    return m_toggleState;
+}
+
+#if 0
+// read the button, obtain physical state and then calculate virtual state
+// repeating is made by inserting fake key-releases into the stream of "pressed" states
+// should be called frequently
+bool AutoRepeatButton::read()
+{
+    Button::read(); //read input and do the debouncing
+
+    m_virtualLastState = m_virtualState;
+    m_virtualState = Button::isPressed();
+
+    if (m_virtualState) {
+        uint32_t t = millis() - lastChange();
+        if (t >= m_delay) { //skip the init delay
+            // repeating...
+            t -= m_delay;
+            t %= m_rate; //cycle in m_rate periods
+            if (t < debounceTime()) //if start of the period
+                m_virtualState = false; //make a virtual key release
+        }
+    }
+    return m_virtualState;
+}
+
+#else
+
+// alternative implementation, previous may not work correctly for slower loop()
+bool AutoRepeatButton::read()
+{
+    Button::read(); //read input and do the debouncing
+
+    m_virtualLastState = m_virtualState;
+    m_virtualState = Button::isPressed();
+
+    if (m_virtualState) {
+        // someone is holding the button
+        uint32_t t = millis() - lastChange(); //how long?
+        if (t >= m_delay) {
+            // do the repeating after m_delay has elapsed
+            t -= m_delay;
+            uint16_t cnt = t / m_rate + 1; //what repeat cycle # is it now?
+            if (m_repeatCounter < cnt && m_virtualLastState) {
+                // if time for next key-release AND lastState=="pressed"
+                m_virtualState = false; //make a virtual key release
+                m_repeatCounter++;
+            }
+        }
+    }
+    else {
+        // physical button is released
+        m_repeatCounter = 0;
+    }
+    return m_virtualState;
+}
+#endif
+
+

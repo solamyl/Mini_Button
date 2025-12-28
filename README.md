@@ -1,7 +1,8 @@
 # Mini_Button
 This is quite minimal Arduino button lib focused on low-memory usage and small amount of code produced.
 * detects presses, releases and long presses
-* async handling to be called from within the loop(). no delay() or similar blocking
+* features optional auto-repeat with delay and rate settings
+* fully async handling. no delay() or similar blocking
 * robust debouncing mechanism
 * small memory footprint (10 bytes per button)
 * easy API (the same as JC_Button)
@@ -9,15 +10,10 @@ This is quite minimal Arduino button lib focused on low-memory usage and small a
 This library was forked from JC_Button by Jack Christensen.
 https://github.com/JChristensen/JC_Button
 
-It uses the same (simple) interface, but the logic was reworked and/or optimized. I hope it is still fully interchangable with the original JC_Button.
+It uses the same (simple) interface, but the logic was almost completly reworked and/or optimized. I think, this lib is still fully interchangable with the original JC_Button.
 
 ## License
-This program is licensed under the [GNU GPLv3 license](LICENSE.md) - the same as the original library.
-https://www.gnu.org/licenses/gpl.html
-
-Mimi_Button Copyright (C) 2025 Štěpán Škrob GNU GPL v3.0
-
-Arduino Button Library Copyright (C) 2018-2019 Jack Christensen GNU GPL v3.0
+This program is licensed under the [GNU GPLv3 license](LICENSE.md) - the same as the original JC_Button library.
 
 ## Introduction
 The Button library is for debouncing and reading momentary contact switches like tactile button switches.  "Long presses" of arbitrary length can be detected. Works well in state machine constructs.  Use the read() function to read each button in the main loop, which should execute as fast as possible.
@@ -27,11 +23,12 @@ The simplest way to use a button with an AVR microcontroller is to wire the butt
 A derived class, ToggleButton, implements button objects that need only "push-on, push-off" functionality.
 
 ## Examples
-The following example sketches are included with the **Button** library:
+The following example sketches are included with the **Mini_Button** library:
 
 - **SimpleOnOff**: Just turns the Arduino's pin 13 LED on and off.
 - **LongPress**: Demonstrates detecting long and short button presses.
 - **UpDown**: Counts up or down, one number at a time or rapidly by holding the button down.
+- **UpDown-AutoRepeatButton**: Example `UpDown` from JC_Button, but made easily with `AutoRepeatButton`.
 - **Toggle**: Demonstrates ToggleButton functionality.
 
 

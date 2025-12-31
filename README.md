@@ -27,8 +27,9 @@ The following example sketches are included with the **Mini_Button** library:
 
 - **SimpleOnOff**: Just turns the Arduino's pin 13 LED on and off.
 - **LongPress**: Demonstrates detecting long and short button presses.
+- **LongPress-LongPressDetector**: The same example as in JC_Button, but simplified using a new class `LongPressDetector`.
 - **UpDown**: Counts up or down, one number at a time or rapidly by holding the button down.
-- **UpDown-AutoRepeatButton**: Example `UpDown` from JC_Button, but made easily with `AutoRepeatButton`.
+- **UpDown-AutoRepeatButton**: The same example as in JC_Button, but made easily with a new class `AutoRepeatButton`.
 - **Toggle**: Demonstrates ToggleButton functionality.
 
 
@@ -60,7 +61,7 @@ Button myButton(4, 25, false, false);
 
 ```
 
-### ToggleButton(pin, initialState, dbTime, pullup, invert)
+### ToggleButton(pin, initState, dbTime, pullup, invert)
 ##### Description
 The constructor defines a toggle button object, which has "push-on, push-off" functionality. The initial state can be on or off. See the section, [ToggleButton Library Functions](https://github.com/JChristensen/JC_Button#togglebutton-library-functions) for functions that apply specifically to the ToggleButton object. The ToggleButton class is derived from the Button class, so all Button functions are available, but because it is inherently a more limited concept, the special ToggleButton functions will be most useful, along with `begin()` and `read()`.
 ##### Syntax
@@ -68,7 +69,7 @@ The constructor defines a toggle button object, which has "push-on, push-off" fu
 ##### Required parameter
 **pin:** Arduino pin number that the button is connected to *(byte)*  
 ##### Optional parameters
-**initialState:** Initial state for the button. Defaults to off (false) if not given. *(bool)*  
+**initState:** Initial state for the button. Defaults to off (false) if not given. *(bool)*  
 **dbTime:** Debounce time in milliseconds, max 60000ms. Defaults to 25ms if not given. *(unsigned long)*  
 **pullup:** *true* to enable the microcontroller's internal pull-up resistor, else *false*. Defaults to *true* if not given. *(bool)*  
 **invert:** *false* interprets a high logic level to mean the button is pressed, *true* interprets a low level as pressed. *true* should be used when a pull-up resistor is employed, *false* for a pull-down resistor. Defaults to *true* if not given. *(bool)*
@@ -194,20 +195,18 @@ The time in milliseconds when the button last changed state *(unsigned long)*
 unsigned long msLastChange = myButton.lastChange();
 ```
 
-## ToggleButton Library Functions
-
 ### changed()
 ##### Description
-Returns a boolean value (true or false) to indicate whether the toggle button changed state the last time `read()` was called.
+Returns a boolean value (true or false) to indicate whether the button changed state the last time `read()` was called.
 ##### Syntax
-`myToggle.changed();`
+`myButton.changed();`
 ##### Parameters
 None.
 ##### Returns
-*true* if the toggle state changed, else *false* *(bool)*
+*true* if the button state changed, else *false* *(bool)*
 ##### Example
 ```c++
-if (myToggle.changed())
+if (myButton.changed())
 {
     // do something
 }
@@ -216,6 +215,8 @@ else
     // do something different
 }
 ```
+
+## ToggleButton Library Functions
 
 ### toggleState()
 ##### Description

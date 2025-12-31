@@ -54,6 +54,15 @@ bool Button::read()
     return m_state;
 }
 
+
+// Initialize a button object
+void ToggleButton::begin()
+{
+    Button::begin();
+    m_lastChange = millis();
+}
+
+
 // read the button and return its state.
 // should be called frequently.
 bool ToggleButton::read()
@@ -62,9 +71,22 @@ bool ToggleButton::read()
 
     if (Button::wasPressed()) {
         m_toggleState = !m_toggleState;
+        m_lastChange = millis();
     }
     return m_toggleState;
 }
+
+
+// Initialize a button object
+void AutoRepeatButton::begin()
+{
+    Button::begin();
+
+    m_virtualState = Button::isPressed();
+    m_virtualLastState = m_virtualState;
+    m_lastChange = millis();
+}
+
 
 #if 0
 // read the button, obtain physical state and then calculate virtual state
@@ -74,35 +96,42 @@ bool AutoRepeatButton::read()
 {
     Button::read(); //read input and do the debouncing
 
+    uint32_t now = millis();
+
     m_virtualLastState = m_virtualState;
     m_virtualState = Button::isPressed();
 
     if (m_virtualState) {
-        uint32_t t = millis() - lastChange();
+        uint32_t t = now - lastChange();
         if (t >= m_delay) { //skip the init delay
             // repeating...
             t -= m_delay;
             t %= m_rate; //cycle in m_rate periods
-            if (t < debounceTime()) //if start of the period
+            if (t < 20/*debounceTime()*/) //if start of the period
                 m_virtualState = false; //make a virtual key release
         }
+    }
+    if (changed()) {
+        m_lastChange = now;
     }
     return m_virtualState;
 }
 
 #else
 
-// alternative implementation, previous may not work correctly for slower loop()
+// alternative implementation
+// previous may not work correctly for slower loop() and/or faster rates
 bool AutoRepeatButton::read()
 {
     Button::read(); //read input and do the debouncing
+    uint32_t now = millis();
 
     m_virtualLastState = m_virtualState;
     m_virtualState = Button::isPressed();
 
     if (m_virtualState) {
         // someone is holding the button
-        uint32_t t = millis() - lastChange(); //how long?
+        uint32_t t = now - lastChange(); //how long?
         if (t >= m_delay) {
             // do the repeating after m_delay has elapsed
             t -= m_delay;
@@ -112,14 +141,48 @@ bool AutoRepeatButton::read()
                 m_virtualState = false; //make a virtual key release
                 m_repeatCounter++;
             }
+            /*Serial.print(millis());
+            Serial.print(": repeat=");
+            Serial.print(m_repeatCounter);
+            Serial.print(", cnt=");
+            Serial.print(cnt);
+            Serial.print(", lastState=");
+            Serial.print(m_virtualLastState);
+            Serial.print(", state=");
+            Serial.print(m_virtualState);
+            Serial.println();*/
         }
     }
     else {
         // physical button is released
         m_repeatCounter = 0;
     }
+    if (changed()) {
+        m_lastChange = now;
+    }
     return m_virtualState;
 }
 #endif
 
 
+// Initialize a Detector object
+void LongPressDetector::begin()
+{
+    m_state = m_buttonPtr->isPressed();
+    m_lastState = m_state;
+    m_lastChange = millis();
+}
+
+
+// Observes specified (another) button for a long press and then updates its state.
+// Does not any physical button input reading! Just observes the state of another class!
+// Call this function frequently to ensure the sketch is responsive to user input.
+bool LongPressDetector::read()
+{
+    m_lastState = m_state;
+    m_state = pressedFor(m_delay);
+    if (changed()) {
+        m_lastChange = millis();
+    }
+    return m_state;
+}
